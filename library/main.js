@@ -12,51 +12,48 @@ app.use(express.urlencoded({
     extended: true
   }));
 
-const BOOk = {
+const book_1 = {
     "id" : 0,
     "name" : "harry potter",
     "author" : "jk rolling",
-    "publishers" : "choom",
-    "yearOfPublish" : "1980",
+    "publisher" : "choom",
+    "year" : "1980",
     "rate" : 3
-}
-const BOOk_1 = {
+};
+const book_2 = {
     "id" : 1,
     "name" : "harry potter",
     "author" : "jk rolling",
-    "publishers" : "choom",
-    "yearOfPublish" : "1980",
-    "rate" : 3
-}
+    "publisher" : "choom",
+    "year" : "1981",
+    "rate" : 1
+};
 
 let ALL_BOOKS = [
-    {
-        "book" : BOOk,
-        "isReserved" : false,
-        "whoReserved" : null,
-        "numberOfExist" : 10
-    },
-    {
-        "book" : BOOk_1,
-        "isReserved" : false,
-        "whoReserved" : null,
-        "numberOfExist" : 10
-    },
-]
+    book_1,
+    book_2
 
-router.route("/test")
-    .post((req,res) => {
-            console.log(req);
-        console.log("+++++++++++++");
-        if (req.body)
-            console.log(req.body);
-        else 
-            res.send("ERROR !!!");
-    })
-// router.post('/test', function (req, res) {
-//     console.log(req);
-//     res.send(req.body);
-//   })
+];
+
+Number_Of_All_Books = ALL_BOOKS.length;
+
+
+router.post('/add-book', function (req, res) {
+
+    new_book = {
+        "id" : Number_Of_All_Books,
+        "name" : req.body.name,
+        "author" : req.body.author,
+        "publisher" : req.body.publisher,
+        "year" : req.body.year,
+        "rate" : req.body.rate,
+    };
+    ALL_BOOKS.push(new_book);
+    console.log("new Book Added successfully. book id : " + Number_Of_All_Books);
+    Number_Of_All_Books += 1;
+    res.sendStatus(200);
+
+  })
   
 
 
@@ -83,17 +80,6 @@ app.get('/get-book', function(req, res){
 });
 
 
-app.post('/add-book', function(req, res){
-    if (req.body)
-    {
-        console.log(req.body);
-        res.send(req.body);
-        
-    }
-    else 
-        res.send("ERROR !!!");
-
-})
 
 
 
@@ -104,7 +90,7 @@ app.delete('/', function(req, res){
 
 
 
-app.put('/', function(req, res){``
+app.put('/', function(req, res){
 
 });
 
