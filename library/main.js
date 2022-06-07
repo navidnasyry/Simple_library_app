@@ -1,116 +1,139 @@
 
 const { ALL } = require('dns');
 let express = require('express');
-let app = express();
+let mongoose = require('mongoose');
+//let MongoClient = require('mongodb').MongoClient;
+const router = require('express').Router();
+const Book = require('./models/book')
 
+let app = express();
 let PORT = 8080;
 let HOSTNAME = "localhost";
 
-const router = require('express').Router();
+
+// MongoClient.connect(db_rul, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// }, (err, client) => {
+//     if (err) {
+//         return console.log(err);
+//     }
+
+//     // Specify database you want to access
+//     const db = client.db('Library');
+
+//     console.log(`MongoDB Connected: ${db_rul}`);
+// });
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
   }));
+app.use(router)
 
-const book_1 = {
-    "id" : 0,
-    "name" : "harry potter",
-    "author" : "jk rolling",
-    "publisher" : "choom",
-    "year" : "1980",
-    "rate" : 3
-};
-const book_2 = {
-    "id" : 1,
-    "name" : "harry potter",
-    "author" : "jk rolling",
-    "publisher" : "choom",
-    "year" : "1981",
-    "rate" : 1
-};
 
-let ALL_BOOKS = [
-    book_1,
-    book_2
 
-];
+Number_Of_All_Books = Book.find().length;
+console.log(Number_Of_All_Books);
 
-Number_Of_All_Books = ALL_BOOKS.length;
+
+const db_url = "mongodb://127.0.0.1:27017";
+mongoose.connect(db_url, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then((result) => {
+        console.log(`MongoDB Connected: ${db_url}\nListening on port ${PORT}`)
+        app.listen(PORT);
+    })
+    .catch((err) => console.log(err));
+
+
+
 
 
 router.post('/add-book', function (req, res) {
-
-    new_book = {
-        "id" : Number_Of_All_Books,
-        "name" : req.body.name,
-        "author" : req.body.author,
-        "publisher" : req.body.publisher,
-        "year" : req.body.year,
-        "rate" : req.body.rate,
-    };
-    ALL_BOOKS.push(new_book);
-    console.log("new Book Added successfully. book id : " + Number_Of_All_Books);
+    console.log("post request to /add-book");
+    const new_book =new Book({
+        id : req.body.id,
+        title : req.body.name,
+        author : req.body.author,
+        publisher : req.body.publisher,
+        year : req.body.year,
+        rate : req.body.rate,
+    });
+    //ALL_BOOKS.push(new_book);
     Number_Of_All_Books += 1;
-    res.sendStatus(200);
+    new_book.save()
+        .then((result) => {
+            console.log("new Book Added successfully. book id : " + Number_Of_All_Books);
+            res.send(result);
+        })
+        .catch((err) =>{
+            console.log(err);
+        })
 
-  })
+  });
   
-
-
-app.use(router)
 
 // app.listen(PORT, IP/)
 
-app.get('/get-all-books', function(req, res){
-    console.log("get request recieved. I return all books to it :)");
-    res.send(ALL_BOOKS)
-})
+router.get('/get-all-books', function(req, res){
+    console.log("get request to /get-all-books");
+    Book.find()
+        .then((result) => {
+            res.send(result);
+        })
+        .catch((err) => {
+            res.send(err);
+        })
+    
+});
 
-app.get('/get-book', function(req, res){
-    console.log("ger request recieved. it request for detail of book " + req.query.id)
-    for(let book of ALL_BOOKS)
-    {
-        if (book["id"] == req.query.id)
-        {
-            res.send(book);
-            break;
-        }
-    }
-    res.send("This Book Not Found !!");
+router.get('/get-book', function(req, res){
+    console.log("get request to /get-book");
+    Book.find({id:req.query.id})
+        .then((result) =>{
+            if(result.length)
+                res.send(result);
+            else{
+                res.status(404);
+                res.send("Book Not Found :(");
+            }
+        })
+        .catch((err) => {
+            res.send("Book Not Found :)");
+        })
+
+});
+
+
+
+router.delete('/delete-book', function(req, res){
+    console.log("delete request to /delete-book");
+    all_books = Book.deleteOne({id:req.query.id})
+        .then((result) => {
+            if(!result.deletedCount)
+                res.status(404);
+            res.send(result);
+        })
+        .catch((err) => {
+            res.send(err);
+        });
+
 });
 
 
 
 
-
-app.delete('/delete-book', function(req, res){
-    console.log("delete")
-    for(let i = 0 ; i < ALL_BOOKS.length ; i+=1)
-    {
-        if (ALL_BOOKS[i].id == req.body.id)
-        {
-            ALL_BOOKS.splice(i, 1);
-            res.send(`Book with id = ${req.body.id} was deleted.`);
-            return;
-        }
-    }
-    res.send(`Book with id = ${req.body.id} not found :(`);
-
-})
-
-
-
-
-app.put('/', function(req, res){
+router.put('/', function(req, res){
 
 });
 
 
-let server = app.listen(8080, function(){
-    // this function is not essential :)
-    console.log("My app lissten on port %s", PORT);
-});
+// let server = app.listen(8080, function(){
+//     // this function is not essential :)
+//     console.log("My app lissten on port %s", PORT);
+// });
 
 
 
