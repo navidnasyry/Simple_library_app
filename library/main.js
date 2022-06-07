@@ -11,22 +11,6 @@ let PORT = 8080;
 let HOSTNAME = "localhost";
 
 
-// MongoClient.connect(db_rul, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// }, (err, client) => {
-//     if (err) {
-//         return console.log(err);
-//     }
-
-//     // Specify database you want to access
-//     const db = client.db('Library');
-
-//     console.log(`MongoDB Connected: ${db_rul}`);
-// });
-
-
-
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
@@ -34,9 +18,6 @@ app.use(express.urlencoded({
 app.use(router)
 
 
-
-Number_Of_All_Books = Book.find().length;
-console.log(Number_Of_All_Books);
 
 
 const db_url = "mongodb://127.0.0.1:27017";
@@ -51,10 +32,17 @@ mongoose.connect(db_url, { useNewUrlParser: true, useUnifiedTopology: true })
 
 
 
-router.post('/add-book', function (req, res) {
+router.post('/add-book', async function (req, res) {
     console.log("post request to /add-book");
+    let last_index = null;
+    let last_book = await Book.find().sort({_id:-1}).limit(1);
+    if (!last_book.length)
+        last_index = 0;
+    else
+        last_index = last_book[0].id;
+
     const new_book =new Book({
-        id : req.body.id,
+        id :  last_index + 1,
         title : req.body.name,
         author : req.body.author,
         publisher : req.body.publisher,
@@ -62,10 +50,10 @@ router.post('/add-book', function (req, res) {
         rate : req.body.rate,
     });
     //ALL_BOOKS.push(new_book);
-    Number_Of_All_Books += 1;
+    //Number_Of_All_Books += 1;
     new_book.save()
         .then((result) => {
-            console.log("new Book Added successfully. book id : " + Number_Of_All_Books);
+            console.log("new Book Added successfully. book id : " + 0);
             res.send(result);
         })
         .catch((err) =>{
@@ -73,10 +61,8 @@ router.post('/add-book', function (req, res) {
         })
 
   });
+
   
-
-// app.listen(PORT, IP/)
-
 router.get('/get-all-books', function(req, res){
     console.log("get request to /get-all-books");
     Book.find()
