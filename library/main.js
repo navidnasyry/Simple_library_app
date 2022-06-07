@@ -1,4 +1,5 @@
 
+const { ALL } = require('dns');
 let express = require('express');
 let app = express();
 
@@ -67,10 +68,10 @@ app.get('/get-all-books', function(req, res){
 })
 
 app.get('/get-book', function(req, res){
-    console.log("ger request recieved. it request for detail of book " + req.query.key)
+    console.log("ger request recieved. it request for detail of book " + req.query.id)
     for(let book of ALL_BOOKS)
     {
-        if (book["book"]["id"] == req.query.key)
+        if (book["id"] == req.query.id)
         {
             res.send(book);
             break;
@@ -83,8 +84,19 @@ app.get('/get-book', function(req, res){
 
 
 
-app.delete('/', function(req, res){
-    console.log("Delete item");
+app.delete('/delete-book', function(req, res){
+    console.log("delete")
+    for(let i = 0 ; i < ALL_BOOKS.length ; i+=1)
+    {
+        if (ALL_BOOKS[i].id == req.body.id)
+        {
+            ALL_BOOKS.splice(i, 1);
+            res.send(`Book with id = ${req.body.id} was deleted.`);
+            return;
+        }
+    }
+    res.send(`Book with id = ${req.body.id} not found :(`);
+
 })
 
 
