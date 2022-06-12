@@ -1,9 +1,11 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 
 exports.register = async function (req, res){
 
+    console.log("Post request to /status/register");
     try{
     
 
@@ -15,7 +17,6 @@ exports.register = async function (req, res){
             res.status(400).send("You must fill all blanks :)");
         }
 
-        console.log(first_name, last_name, email, password);
         const old_user_email = await User.findOne({ email });
         const old_user_username = await User.findOne({ username });
 
@@ -30,6 +31,7 @@ exports.register = async function (req, res){
         //encrypt password
         encryptedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
+            username,
             first_name,
             last_name,
             email : email.toLowerCase(),
@@ -41,7 +43,7 @@ exports.register = async function (req, res){
     // Create token
     const token = jwt.sign(
             {
-                user_id: user._id, email, username 
+                user_id: user._id, username 
             },
             process.env.TOKEN_KEY,
             {
@@ -51,7 +53,8 @@ exports.register = async function (req, res){
 
         // save user token
         user.token = token;
-
+        user.save();
+        console.log("new user registered sucessfully...:)")
         // return new user
         res.status(201).json(user);
         // Our register logic ends here
@@ -63,6 +66,7 @@ exports.register = async function (req, res){
 
 
 exports.login = async function (req, res){
+    console.log("Post request to /status/login");
 
 
     try{
@@ -81,7 +85,7 @@ exports.login = async function (req, res){
             // Create token
             const token = jwt.sign(
                 { 
-                    user_id: user._id, email, username
+                    user_id: user._id, username
                 },
                 process.env.TOKEN_KEY,
                 {
@@ -90,8 +94,10 @@ exports.login = async function (req, res){
             )
             // save user token
             user.token = token;
+            user.save();
 
             // user
+            console.log("new user login sucessfully...:)")
             res.status(200).json(user);
         }
 
