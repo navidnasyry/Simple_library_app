@@ -3,7 +3,6 @@ let mongoose = require('mongoose');
 require('dotenv').config();
 
 const MONGO_URL = process.env.MONGO_URL;
-console.log(MONGO_URL)
 
 exports.connect = () => {
     // Connecting to the database

@@ -7,6 +7,7 @@ const router = require('express').Router();
 //read from env file
 const PORT = process.env.PORT;
 
+// app
 let app = express();
 app.use(express.json());
 app.use(express.urlencoded({
@@ -26,8 +27,8 @@ app.listen(PORT, () => {
   
 
 // apis
-app.use('/lib',require('./routes/BookRoutes'));
-
+app.use('/lib', require('./routes/BookRoutes'));
+app.use('/status', require('./routes/UserRoutes'));
 
 
 
