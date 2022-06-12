@@ -1,14 +1,11 @@
 
 const { ALL } = require('dns');
 let express = require('express');
-let mongoose = require('mongoose');
 const router = require('express').Router();
-const Book = require('./models/book')
 
 let app = express();
 let PORT = 8080;
 let HOSTNAME = "localhost";
-console.log("inja");
 
 
 app.use(express.json());
@@ -17,17 +14,22 @@ app.use(express.urlencoded({
   }));
 app.use(router);
 
+
+// connect to db
+require("./config/database").connect();
+
+
+// server listening 
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+  
+
+// apis
 app.use('/lib',require('./routes/BookRoutes'));
 
 
 
-const db_url = "mongodb://127.0.0.1:27017";
-mongoose.connect(db_url, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then((result) => {
-        console.log(`MongoDB Connected: ${db_url}\nListening on port ${PORT}`)
-        app.listen(PORT);
-    })
-    .catch((err) => console.log(err));
 
 
 
