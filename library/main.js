@@ -1,13 +1,13 @@
 
 const { ALL } = require('dns');
+require("dotenv").config();
 let express = require('express');
 const router = require('express').Router();
 
+//read from env file
+const PORT = process.env.PORT;
+
 let app = express();
-let PORT = 8080;
-let HOSTNAME = "localhost";
-
-
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true

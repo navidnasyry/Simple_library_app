@@ -1,11 +1,13 @@
 
-let mongoose = require('mongoose')
-const MONGO_URI = "mongodb://127.0.0.1:27017";
+let mongoose = require('mongoose');
+require('dotenv').config();
 
+const MONGO_URL = process.env.MONGO_URL;
+console.log(MONGO_URL)
 
 exports.connect = () => {
     // Connecting to the database
-    mongoose.connect(MONGO_URI, {
+    mongoose.connect(MONGO_URL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       })
